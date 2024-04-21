@@ -8,6 +8,7 @@ class Profile(models.Model):
 
 
 class Collection(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE, default=None)
     title = models.CharField(max_length=100)
     description = models.TextField(blank=True, null=True)
     created_at = models.DateTimeField(default=timezone.now)
@@ -26,6 +27,7 @@ class Link(models.Model):
         ('video', 'Video'),
     ]
 
+    user = models.ForeignKey(User, on_delete=models.CASCADE, default=None)
     title = models.CharField(max_length=200)
     description = models.TextField(blank=True)
     url = models.URLField(unique=True)

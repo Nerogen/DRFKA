@@ -1,14 +1,13 @@
 import requests
 from bs4 import BeautifulSoup
-from rest_framework import generics
+from rest_framework import generics, permissions
 from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from .models import Collection
 from .models import Link
-from .serializers import CollectionSerializer
-from .serializers import LinkSerializer
+from .serializers import CollectionSerializer, LinkSerializer
 
 
 def extract_link_data(url):
@@ -62,21 +61,33 @@ class CreateLinkAPIView(APIView):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
-class LinkListCreateAPIView(generics.ListCreateAPIView):
-    queryset = Link.objects.all()
-    serializer_class = LinkSerializer
-
-
 class LinkDetailAPIView(generics.RetrieveUpdateDestroyAPIView):
     queryset = Link.objects.all()
     serializer_class = LinkSerializer
 
 
-class CollectionListCreateAPIView(generics.ListCreateAPIView):
-    queryset = Collection.objects.all()
-    serializer_class = CollectionSerializer
-
-
 class CollectionDetailAPIView(generics.RetrieveUpdateDestroyAPIView):
     queryset = Collection.objects.all()
     serializer_class = CollectionSerializer
+
+
+class CollectionListCreateAPIView(generics.ListCreateAPIView):
+    serializer_class = CollectionSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get_queryset(self):
+        return Collection.objects.filter(user=self.request.user)
+
+    def perform_create(self, serializer):
+        serializer.save(user=self.request.user)
+
+
+class LinkListCreateAPIView(generics.ListCreateAPIView):
+    serializer_class = LinkSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get_queryset(self):
+        return Link.objects.filter(user=self.request.user)
+
+    def perform_create(self, serializer):
+        serializer.save(user=self.request.user)

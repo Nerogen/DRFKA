@@ -2,6 +2,7 @@ from django.urls import path
 from rest_framework import permissions
 from drf_yasg.views import get_schema_view
 from drf_yasg import openapi
+from rest_framework.authtoken.views import obtain_auth_token
 
 from .views import LinkListCreateAPIView, LinkDetailAPIView, CollectionListCreateAPIView, CollectionDetailAPIView
 
@@ -19,6 +20,7 @@ schema_view = get_schema_view(
 )
 
 urlpatterns = [
+    path('api/token/', obtain_auth_token, name='api_token_auth'),
     path('api/links/', LinkListCreateAPIView.as_view(), name='link-list-create'),
     path('api/links/<int:pk>/', LinkDetailAPIView.as_view(), name='link-detail'),
     path('api/collections/', CollectionListCreateAPIView.as_view(), name='collection-list-create'),
